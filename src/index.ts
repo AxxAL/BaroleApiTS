@@ -1,7 +1,7 @@
 import App from "./App";
 import database from "mongoose";
 
-const connectionString = process.env.CONNECTION_STRING;
+const connectionString = process.env.CONNECTION_STRING as string;
 
 database.connect(connectionString, () => console.log("Connected to database"));
 
