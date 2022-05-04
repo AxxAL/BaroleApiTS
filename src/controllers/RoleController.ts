@@ -18,8 +18,6 @@ export default class RoleController extends Controller {
     }
 
     private async createRole(req: Request, res: Response) {
-        console.log(req.body);
-
         const role = new Role(req.body);
 
         try {
