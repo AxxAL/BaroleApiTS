@@ -21,6 +21,15 @@ const roleSchema: Schema = new Schema({
     },
     additionalInfo: String,
     tips: String
+},
+{
+    toJSON: {
+        virtuals: true,
+        transform: function (doc, converted) {
+            delete converted._id;
+            delete converted.__v;
+        }
+    }
 });
 
 const Role = model("Role", roleSchema);

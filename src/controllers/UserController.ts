@@ -1,26 +1,37 @@
 import { Request, Response } from "express";
 import User from "../models/User";
+import config from "../Config";
 import Controller from "./Controller";
 import { sign } from "jsonwebtoken";
+import { isAuthorized } from "../middleware/Authentication";
 
 export default class UserController extends Controller {
-
-    private secret: string;
     
     constructor() {
         super("/user");
-        this.secret = process.env.SECRET as string;
-        this.initializeRoutes();
     }
 
     private async createUser(req: Request, res: Response) {
-        const user = new User(req.body);
+        const { username, password } = req.body;
+
+        if (await User.findOne({ username })) {
+            return res.status(400).send({ error: "User already exists" });
+        }
+
+        const user = new User({ username, password });
 
         try {
             const result = await user.save();
-            res.send(result);
+            
+            const token = sign({ username, password }, config.SECRET, { expiresIn: "4h" });
+
+            return res.send({
+                data: result,
+                token
+            });
         } catch(error) {
-            res.status(500).send({ error });
+            console.log(error);
+            res.status(500).send({ error: "Failed to create user" });
         }
     }
 
@@ -31,19 +42,29 @@ export default class UserController extends Controller {
             const user = await User.findOne({ username });
 
             if (!user) {
-                return res.status(401).send({ error: "User not found" });
+                return res.status(401).send({ error: "Invalid credentials" });
             }
 
-            if (await user.validatePassword(password)) {
-                return sign(user, this.secret, { expiresIn: "4h" });
+            const passwordsMatch = await user.validatePassword(password);
+
+            if (!passwordsMatch) {
+                return res.status(401).send({ error: "Invalid credentials" });
             }
+
+            const token = sign(req.body, config.SECRET, { expiresIn: "4h" });
+
+            return res.send({
+                data: user,
+                token
+            });
 
         } catch(error) {
-            return res.status(500).send({ error });
+            console.log(error);
+            return res.status(500).send({ error: "Failed to authenticate user" });
         }
     }
 
-    public initializeRoutes() {
+    protected configureRoutes(): void {
         console.log("Initializing routes for UserController");
         this.addRoutePost("create", this.createUser);
         this.addRoutePost("auth", this.authenticateUser);

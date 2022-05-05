@@ -10,6 +10,19 @@ const userSchema: Schema = new Schema({
         type: String,
         required: true,
     }
+},
+{
+    toObject: {
+        transform: function(doc, converted) {}
+    },
+    toJSON: {
+        virtuals: true,
+        transform: function (doc, converted) {
+            delete converted._id;
+            delete converted.password;
+            delete converted.__v
+        }
+      },
 });
 
 userSchema.methods.validatePassword = async function(password: string): Promise<boolean> {
