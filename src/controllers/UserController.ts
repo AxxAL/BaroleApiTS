@@ -35,6 +35,20 @@ export default class UserController extends Controller {
         }
     }
 
+    private async deleteUser(req: Request, res: Response) {
+        const { id } = req.params;
+
+        try {
+            const result = await User.findByIdAndDelete(id);
+            if (!result) {
+                return res.status(404).send({ error: "User not found" });
+            }
+            return res.send(result);
+        } catch(error) {
+            return res.status(500).send({ error });
+        }
+    }
+
     private async authenticateUser(req: Request, res: Response) {
         const { username, password } = req.body;
 
@@ -67,6 +81,7 @@ export default class UserController extends Controller {
     protected configureRoutes(): void {
         console.log("Initializing routes for UserController");
         this.addRoutePost("create", this.createUser, [ isAuthorized ]);
+        this.addRouteDelete("delete/:id", this.deleteUser, [ isAuthorized ]);
         this.addRoutePost("auth", this.authenticateUser);
     }
 }

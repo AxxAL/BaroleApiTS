@@ -23,6 +23,20 @@ export default abstract class Controller {
         console.log(`Registered POST endpoint: /api/v1${fullPath}`);
     }
 
+    protected addRoutePut(endpoint: String, callback: any, middleware: any = []) {
+        middleware.push(json());
+
+        const fullPath: string = `${this.path}/${endpoint}`;
+        this.router.put(fullPath, middleware, callback);
+        console.log(`Registered PUT endpoint: /api/v1${fullPath}`);
+    }
+
+    protected addRouteDelete(endpoint: String, callback: any, middleware: any = []) {
+        const fullPath: string = `${this.path}/${endpoint}`;
+        this.router.delete(fullPath, middleware, callback);
+        console.log(`Registered DELETE endpoint: /api/v1${fullPath}`);
+    }
+
     public getRouter() {
         return this.router;
     }

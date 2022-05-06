@@ -17,6 +17,31 @@ export default class RoleController extends Controller {
             .catch(error => res.status(500).send({ error }));
     }
 
+    private async getRoleById(req: Request, res: Response) {
+        const { id } = req.params;
+
+        Role.findById(id, {
+            __v: 0
+        })
+            .then(role => res.send(role))
+            .catch(error => res.status(500).send({ error }));
+    }
+
+    private async getRoleByTitle(req: Request, res: Response) {
+        const { title } = req.params;
+
+        try {
+            const role = await Role.find({ title: { $regex: title, $options: "i" } });
+            
+            if (!role) {
+                return res.status(404).send({ error: "Role not found" });
+            }
+            return res.send(role);
+        } catch (error) {
+            return res.status(500).send({ error });
+        }
+    }
+
     private async createRole(req: Request, res: Response) {
         const role = new Role(req.body);
 
@@ -28,9 +53,26 @@ export default class RoleController extends Controller {
         }
     }
 
+    private async deleteRole(req: Request, res: Response) {
+        const { id } = req.params;
+
+        try {
+            const result = await Role.findByIdAndDelete(id);
+            if (!result) {
+                return res.status(404).send({ error: "Role not found" });
+            }
+            return res.send(result);
+        } catch(error) {
+            return res.status(500).send({ error });
+        }
+    }
+
     protected configureRoutes(): void {
         console.log("Initializing routes for RoleController");
+        this.addRouteGet("id/:id", this.getRoleById);
+        this.addRouteGet("titleSearch/:title", this.getRoleByTitle);
         this.addRouteGet("all", this.getAllRoles);
         this.addRoutePost("create", this.createRole, [ isAuthorized ]);
+        this.addRouteDelete("delete/:id", this.deleteRole, [ isAuthorized ]);
     }
 }
