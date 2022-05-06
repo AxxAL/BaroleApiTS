@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { isAuthorized } from "../middleware/Authentication";
 import Role from "../models/Role";
 import Controller from "./Controller";
 
@@ -6,7 +7,6 @@ export default class RoleController extends Controller {
 
     constructor() {
         super("/role");
-        this.initializeRoutes();
     }
 
     private getAllRoles(req: Request, res: Response) {
@@ -18,8 +18,6 @@ export default class RoleController extends Controller {
     }
 
     private async createRole(req: Request, res: Response) {
-        console.log(req.body);
-
         const role = new Role(req.body);
 
         try {
@@ -30,9 +28,9 @@ export default class RoleController extends Controller {
         }
     }
 
-    public initializeRoutes() {
+    protected configureRoutes(): void {
         console.log("Initializing routes for RoleController");
         this.addRouteGet("all", this.getAllRoles);
-        this.addRoutePost("create", this.createRole);
+        this.addRoutePost("create", this.createRole, [ isAuthorized ]);
     }
 }

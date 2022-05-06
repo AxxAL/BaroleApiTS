@@ -6,13 +6,15 @@ import cors from "cors";
 
 import RoleController from "./controllers/RoleController";
 import Controller from "./controllers/Controller";
+import UserController from "./controllers/UserController";
 
 export default class App {
     private app: Application;
     private port: number;
 
     private controllers: Array<Controller> = [
-        new RoleController()
+        new RoleController(),
+        new UserController()
     ];
 
     constructor() {

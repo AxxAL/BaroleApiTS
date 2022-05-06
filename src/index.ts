@@ -1,16 +1,11 @@
+console.clear();
+
 import App from "./App";
 import database from "mongoose";
+import config from "./Config";
 
-const connectionString = process.env.CONNECTION_STRING as string;
+const connectionString = config.CONNECTION_STRING;
 
 database.connect(connectionString, () => console.log("Connected to database"));
-
-// Rename _id to id in json responses.
-database.set('toJSON', {
-    virtuals: true,
-    transform: (doc, converted) => {
-        delete converted._id;
-    }
-});
 
 new App().run();
