@@ -66,7 +66,7 @@ export default class UserController extends Controller {
 
     protected configureRoutes(): void {
         console.log("Initializing routes for UserController");
-        this.addRoutePost("create", this.createUser);
+        this.addRoutePost("create", this.createUser, [ isAuthorized ]);
         this.addRoutePost("auth", this.authenticateUser);
     }
 }
