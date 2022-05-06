@@ -69,10 +69,10 @@ export default class RoleController extends Controller {
 
     protected configureRoutes(): void {
         console.log("Initializing routes for RoleController");
-        this.addRouteGet("id/:id", this.getRoleById);
+        this.addRouteGet(":id", this.getRoleById);
         this.addRouteGet("titleSearch/:title", this.getRoleByTitle);
         this.addRouteGet("all", this.getAllRoles);
         this.addRoutePost("create", this.createRole, [ isAuthorized ]);
-        this.addRouteDelete("delete/:id", this.deleteRole, [ isAuthorized ]);
+        this.addRouteDelete(":id", this.deleteRole, [ isAuthorized ]);
     }
 }
